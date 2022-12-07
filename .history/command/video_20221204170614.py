@@ -1,0 +1,34 @@
+import discord
+from discord.ext import commands
+import aiohttp
+import json
+import random
+from command.random_list import list_color
+class video(commands.Cog):
+    config = {
+      "name": "Video",
+      "desc": "gif video theo từng category+)",
+      "use": "<prefix>video <category>",
+      "author": "Anh Duc(aki team)"
+    }
+    def __init__(self, bot):
+        self.bot = bot
+    @commands.command()
+    async def video(self, ctx):
+        try:
+            async with aiohttp.ClientSession() as session:
+                get = await session.get('https://api.vangbanlanhat.tk/api/video')
+                data = await get.json()
+                categories = data['categories']
+                category = random.choice(categories)
+                await ctx.send(f'Category: {category}')
+                get = await session.get(f'https://api.hclaptrinh.repl.co/api/video/{category}')
+                data = await get.json()
+                results = data['results']   
+                for result in results:
+                    await ctx.send(result['url'])
+        except Exception as e:
+            print(e)
+async def setup(bot):
+    await bot.add_cog(video(bot))
+
